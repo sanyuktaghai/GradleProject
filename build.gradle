@@ -17,3 +17,10 @@ allprojects {
         jcenter()
     }
 }
+task localGCEServerTask(dependsOn: [":backend:appengineRun",
+                                    ":app:connectedAndroidTest",
+                                    ':backend:appengineStop']) {
+    doLast {
+        println 'localGCEServerTask completed'
+    }
+}
