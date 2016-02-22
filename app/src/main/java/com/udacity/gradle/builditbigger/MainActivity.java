@@ -1,22 +1,12 @@
 package com.udacity.gradle.builditbigger;
 
-import android.content.Context;
-import android.content.Intent;
-import android.os.AsyncTask;
+
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-
-import com.example.sanyukta.android_joke_library.JokeActivity;
-import com.example.sanyukta.myapplication.backend.myApi.MyApi;
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.extensions.android.json.AndroidJsonFactory;
-
-import java.io.IOException;
+import android.widget.ProgressBar;
 
 
 /**
@@ -29,6 +19,8 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getSupportFragmentManager().beginTransaction().
+                add(R.id.fragment,new MainActivityFragment()).commit();
     }
 
     @Override
@@ -54,7 +46,8 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void tellJoke(View view){
-        new EndpointAsyncTask(this).execute();
+        ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressbar);
+        new EndpointAsyncTask(this, progressBar).execute();
     }
 
 }

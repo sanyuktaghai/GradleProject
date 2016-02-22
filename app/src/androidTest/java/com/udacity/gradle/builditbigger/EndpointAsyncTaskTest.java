@@ -17,8 +17,9 @@ public class EndpointAsyncTaskTest extends AndroidTestCase {
         // Testing that Async task successfully retrieves a non-empty string
         // You can test this by right click on androidTest -> Run 'Tests' in ... in an emulator
         String result = null;
-        EndpointAsyncTask endpointAsyncTask = new EndpointAsyncTask();
-        endpointAsyncTask.execute(new Pair<Context, String>(getContext(), "Sanyukta"));
+        EndpointAsyncTask endpointAsyncTask = new EndpointAsyncTask(getContext(),null);
+        endpointAsyncTask.execute();
+        //endpointAsyncTask.execute(new Pair<Context, String>(getContext(), "Sanyukta"));
         try {
             result = endpointAsyncTask.get();
             Log.d(LOG_TAG, "Retrieved a non-empty string successfully: " + result);

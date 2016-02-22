@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Pair;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.example.sanyukta.android_joke_library.JokeActivity;
 import com.example.sanyukta.myapplication.backend.myApi.MyApi;
@@ -24,9 +26,12 @@ class EndpointAsyncTask extends AsyncTask<Pair<Context, String>, Void, String> {
     private Context myContext;
     private InterstitialAd interstitialAd;
     private String myResult;
+    private ProgressBar myProgressBar;
 
-    public EndpointAsyncTask(Context context){
+
+    public EndpointAsyncTask(Context context, ProgressBar progressBar){
         myContext = context;
+        myProgressBar = progressBar;
         MyApi.Builder builder = new MyApi.Builder(AndroidHttp.newCompatibleTransport(), new AndroidJsonFactory(), null)
                 .setRootUrl("https://my-gradle-project.appspot.com/_ah/api/");
         myApiService = builder.build();
@@ -35,16 +40,10 @@ class EndpointAsyncTask extends AsyncTask<Pair<Context, String>, Void, String> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        interstitialAd = new InterstitialAd(myContext);
-        interstitialAd.setAdUnitId(myContext.getString(R.string.interstitial_ad_unit_id));
-        interstitialAd.setAdListener(new AdListener() {
-            @Override
-            public void onAdClosed() {
-                requestNewInterstitial();
-                startJokeActicity();
-            }
-        });
-        requestNewInterstitial();
+
+        if (myProgressBar != null) {
+            myProgressBar.setVisibility(View.VISIBLE);
+        }
     }
 
     private void requestNewInterstitial() {
@@ -76,12 +75,35 @@ class EndpointAsyncTask extends AsyncTask<Pair<Context, String>, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
-        // If the ad is loaded show it, otherwise show the joke
         myResult = result;
-        if (interstitialAd.isLoaded()) {
-            interstitialAd.show();
-        } else {
-            startJokeActicity();
-        }
+        interstitialAd = new InterstitialAd(myContext);
+        interstitialAd.setAdUnitId(myContext.getString(R.string.interstitial_ad_unit_id));
+        interstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                startJokeActicity();
+            }
+
+            @Override
+            public void onAdLoaded() {
+                super.onAdLoaded();
+                if (myProgressBar != null) {
+                    myProgressBar.setVisibility(View.GONE);
+                }
+                interstitialAd.show();
+            }
+
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+                super.onAdFailedToLoad(errorCode);
+                if (myProgressBar != null) {
+                    myProgressBar.setVisibility(View.GONE);
+                }
+                startJokeActicity();
+            }
+        });
+
+        requestNewInterstitial();
+
     }
 }
